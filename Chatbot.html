@@ -1,0 +1,43 @@
+import streamlit as st
+import time
+
+st.set_page_config(
+    page_title="Chatbot",
+    page_icon="🤖",
+    layout="centered"
+)
+
+if "messages" not in st.session_state:
+    st.session_state.messages = [
+        {"role": "assistant", "content": "Hello! I'm ready to display your messages!"}
+    ]
+
+st.title("🤖 Chatbot ")
+st.markdown("Welcome! ask me anything.")
+
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.write(message["content"])
+
+# Handle user input
+if prompt := st.chat_input("Say something..."):
+    
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    
+    with st.chat_message("user"):
+        st.write(prompt)
+
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_response = ""
+        assistant_response = f"Received: '{prompt}'. (Waiting for LLM connection...)"
+        
+        for chunk in assistant_response.split():
+            full_response += chunk + " "
+            time.sleep(0.05)
+            message_placeholder.write(full_response + "▌") 
+            
+    
+        message_placeholder.write(full_response)
+        
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
